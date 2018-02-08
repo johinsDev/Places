@@ -1,0 +1,9 @@
+{
+  "name": "places",
+  "version": "1.0.0",
+  "description": "PLaces sites with node",
+  "main": "index.js",
+  "repository": "git@github.com:johinsDev/Places.git",
+  "author": "johinsdev",
+  "license": "MIT"
+}
