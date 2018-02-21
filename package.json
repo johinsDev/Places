@@ -5,5 +5,60 @@
   "main": "index.js",
   "repository": "git@github.com:johinsDev/Places.git",
   "author": "johinsdev",
-  "license": "MIT"
+  "license": "MIT",
+  "lint-staged": {
+    "src/**/*.js": [
+      "yarn prettier",
+      "git add"
+    ]
+  },
+  "scripts": {
+    "build": "nps build",
+    "start": "nps",
+    "dev": "nps dev",
+    "dev:debug": "nps dev.debug",
+    "prettier": "prettier --single-quote --print-width 80 --trailing-comma all --write '{src,__{tests,mocks}__}/**/*.js'",
+    "precommit": "nps lintStaged && nps validate",
+    "lint": "nps lint",
+    "lint:fix": "nps lint.fix"
+  },
+  "devDependencies": {
+    "apidoc": "^0.17.6",
+    "babel": "^6.23.0",
+    "babel-cli": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-register": "^6.26.0",
+    "eslint": "^4.18.1",
+    "eslint-config-equimper": "^2.2.2",
+    "eslint-config-prettier": "^2.9.0",
+    "lint-staged": "^6.1.1",
+    "morgan": "^1.9.0",
+    "nodemon": "^1.15.1",
+    "nps": "^5.7.1",
+    "nps-utils": "^1.5.0",
+    "prettier": "^1.10.2",
+    "webpack": "^3.11.0",
+    "webpack-node-externals": "^1.6.0",
+    "webpack-sources": "^1.1.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "compression": "^1.7.2",
+    "config": "^1.29.4",
+    "cors": "^2.8.4",
+    "dotenv": "^5.0.0",
+    "express": "^4.16.2",
+    "express-validation": "^1.0.2",
+    "express-winston": "^2.5.0",
+    "helmet": "^3.11.0",
+    "http-status": "^1.0.1",
+    "joi": "^13.1.2",
+    "method-override": "^2.3.10",
+    "mongose": "^0.0.2-security",
+    "pretty-error": "^2.1.1",
+    "raven": "^2.4.1",
+    "winston": "^2.4.0"
+  }
 }
