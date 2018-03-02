@@ -1,12 +1,11 @@
-require('dotenv').config()
-
+require('dotenv').config();
+import Config from './src/Core/Config';
 import express from 'express';
 
-const config = require('config');
 
 const app = express();
-
-const PORT = config.get('PORT');
+const config = new Config('./src/config');
+const PORT = config.get('app.PORT');
 
 app.listen(PORT, err => {
   if (err) {
