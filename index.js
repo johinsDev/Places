@@ -1,11 +1,11 @@
 require('dotenv').config();
-import Config from './src/Core/Config';
+import config from './src/Core/Config';
 import express from 'express';
-
+import routes from './src/routes';
 
 const app = express();
-const config = new Config('./src/config');
 const PORT = config.get('app.PORT');
+app.use(config.get('app.API_ROUTE'), routes);
 
 app.listen(PORT, err => {
   if (err) {

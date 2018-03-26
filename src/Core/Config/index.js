@@ -1,15 +1,14 @@
-'use strict';
-
-const _ = require('lodash')
+const _ = require('lodash');
 const requireAll = require('require-all')
-var fs = require('fs')
+const fs = require('fs')
+const path = require('path');
 const debug = require('debug')('adonis:framework')
 
-export default class Config {
+class Config {
   constructor (configPath) {
     this._configPath = configPath
     this._config = {}
-    this.syncWithFileSystem();
+    this.syncWithFileSystem(); 
   }
 
   syncWithFileSystem () {
@@ -19,7 +18,7 @@ export default class Config {
       files.forEach((file) => {
         const name = this.filterFile(file);
         if (!name) return;
-        this._config[name] = require('../../config/' + file);
+        this._config[name] = require("../../config/" + file);
       });
 
       debug('loaded all config files from %s', this._configPath)
@@ -55,4 +54,6 @@ export default class Config {
   }
 }
 
+const config = new Config('./src/config');
+export default config;
 
