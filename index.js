@@ -1,11 +1,15 @@
 require('dotenv').config();
-import config from './src/Core/Config';
 import express from 'express';
 import routes from './src/routes';
+import constants from './src/config/constants';
+import middlewaresConfig from './src/services/middlewares';
+import './src/config/database';
 
 const app = express();
-const PORT = config.get('app.PORT');
-app.use(config.get('app.API_ROUTE'), routes);
+const PORT = constants.PORT;
+
+middlewaresConfig(app);
+app.use('/api', routes);
 
 app.listen(PORT, err => {
   if (err) {

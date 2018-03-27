@@ -6,7 +6,7 @@ import Raven from 'raven';
 import PrettyError from 'pretty-error';
 import HTTPStatus from 'http-status';
 
-import config from '../Core/Config';
+import constants from '../config/constants';
 import APIError, { RequiredError } from './error';
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -23,7 +23,7 @@ export default function logErrorService(err, req, res, next) {
   }
 
   if (isProd) {
-    const raven = new Raven.Client(config.get('app.RAVEN_ID'));
+    const raven = new Raven.Client(constants.RAVEN_ID);
     raven.captureException(err);
   }
 
