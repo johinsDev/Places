@@ -14,7 +14,8 @@ export async function create(req, res, next) {
 
 export async function index(req, res, next) {
   try {
-    return res.status(HTTPStatus.OK).json(await Place.find({}));
+    const { page } = req.query;
+    res.status(HTTPStatus.OK).json(await Place.list({ page }));
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
