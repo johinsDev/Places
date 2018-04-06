@@ -17,12 +17,14 @@ const PlaceSchema = new Schema({
   closeHour: Number
 }, { timestamps: true });
 
+const fillable = [ 'description', 'title' ];
+
 mongoosePaginate.paginate.options = {
   limit: 2,
   sort: { createdAt: '-1'},
   page: 1
 };
-// agregarla prev, y next parametros que se basen en la url
+
 PlaceSchema.plugin(mongoosePaginate);
 
 PlaceSchema.query.list = function({ sort = { createdAt: '-1' }, limit = 10, page = 1 } = {}) {
@@ -36,8 +38,21 @@ PlaceSchema.statics.list = function({ sort = { createdAt: '-1' }, limit = 5, pag
 PlaceSchema.methods = {
  toJSON() {
     return {
-      title: this.title
+      title: this.title,
+      description: this.description
     };
+  },
+  update(params) {
+    const newParams = {};
+    fillable.forEach(attr => {
+      if (Object.prototype.hasOwnProperty.call(params, attr)) {
+        newParams[attr] = params[attr];
+      }
+    });
+
+    const place = Object.assign(this, newParams);
+    
+    return place.save();
   }
 }
 
