@@ -32,6 +32,7 @@ routes.delete('/:id',
 
 routes.post(
   '/',
+  PlaceController.uploadImage(),
   PlaceController.create,
 );
 

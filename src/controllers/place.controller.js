@@ -1,14 +1,23 @@
 import Place from '../models/place.model';
+import { dispatch as jobUploadImage } from '../jobs/post.jobs';
 import APIError from '../services/error';
 import HTTPStatus from 'http-status';
+import upload from '../config/multer';
+
+// MIDDLEWARES
+
+export function uploadImage() {
+  return upload.fields([
+    { name: 'avatar', maxCount: 1 },
+    { name: 'cover', maxCount: 1 }
+  ]);
+}
 
 export async function find(req, res, next) {
   try {
     req.place = await Place.findById(req.params.id);
 
-    if (!req.place) {
-      next(new APIError('Not Found Place!', HTTPStatus.NOT_FOUND, true));
-    }
+    if (!req.place) next(new APIError('Not Found Place!', HTTPStatus.NOT_FOUND, true));
 
     next();
   } catch (err) {
@@ -16,11 +25,17 @@ export async function find(req, res, next) {
   }
 }
 
+// CONTROLLER FUNCTIONS
+
 export async function create(req, res, next) {
   try {
+    const place = await Place.create(req.body);
+
+    jobUploadImage({ files: req.files, place });
+
     return res
       .status(HTTPStatus.CREATED)
-      .json(await Place.create(req.body));
+      .json(place);
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
@@ -65,3 +80,4 @@ export async function destroy(req, res, next) {
     return next(err);
   }
 }
+

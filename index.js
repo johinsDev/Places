@@ -1,5 +1,6 @@
 require('dotenv').config();
 import express from 'express';
+import kue from 'kue';
 import routes from './src/routes';
 import constants from './src/config/constants';
 import middlewaresConfig from './src/services/middlewares';
@@ -10,7 +11,7 @@ const PORT = constants.PORT;
 
 middlewaresConfig(app);
 app.use('/api', routes);
-
+kue.app.listen( 3000 );
 app.listen(PORT, err => {
   if (err) {
     console.log('Cannot run');

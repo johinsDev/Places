@@ -1,10 +1,10 @@
-import cloudinary from 'cloudianry';
+import cloudinary from 'cloudinary';
 import APIError from '../services/error';
 import HTTPStatus from 'http-status';
-import { CLOUDINARY_ENVIROMENT, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } from '../config/constants';
+import { CLOUDINARY_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } from '../config/constants';
 
 cloudinary.config({
-  cloud_name: CLOUDINARY_ENVIROMENT,
+  cloud_name: CLOUDINARY_NAME,
   api_key: CLOUDINARY_API_KEY,
   api_secret: CLOUDINARY_API_SECRET
 });
@@ -18,4 +18,5 @@ const upload = path => (
     });
   })
 );
+
 export default upload;
