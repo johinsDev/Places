@@ -19,7 +19,7 @@ routes.get('/:id',
   PlaceController.show
 );
 
-routes.patch(
+routes.put(
   '/:id',
   PlaceController.find,
   PlaceController.update

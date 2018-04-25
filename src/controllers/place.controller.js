@@ -15,7 +15,7 @@ export function uploadImage() {
 
 export async function find(req, res, next) {
   try {
-    req.place = await Place.findById(req.params.id);
+    req.place = await Place.findByIdOrSlug(req.params.id);
 
     if (!req.place) next(new APIError('Not Found Place!', HTTPStatus.NOT_FOUND, true));
 
@@ -45,7 +45,7 @@ export async function create(req, res, next) {
 export async function index(req, res, next) {
   try {
     const { page } = req.query;
-    res.status(HTTPStatus.OK).json(await Place.list({ page }));
+    res.status(HTTPStatus.OK).json(await Place.paginate({}, { page: 3, limit: 10 }));
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);
