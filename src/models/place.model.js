@@ -1,6 +1,7 @@
 import mongoose, { Schema, Types } from 'mongoose';
 import uploader from '../services/cloudinary';
 import mongoosePaginate from 'mongoose-paginate';
+import { filteredBody } from '../utils/filteredBody';
 import slug from 'slug';
 
 function getAvatar(avatar) {
@@ -38,7 +39,7 @@ const PlaceSchema = new Schema({
   closeHour: Number
 }, { timestamps: true });
 
-const fillable = [ 'description', 'title', 'avatarImage', 'coverImage' ];
+const filleable = [ 'description', 'title', 'avatarImage', 'coverImage', 'openHour' ];
 
 PlaceSchema.pre('save', async function(next){
   try{
@@ -73,6 +74,11 @@ PlaceSchema.query.list = function({ sort = { createdAt: '-1' }, limit = 10, page
 }
 
 PlaceSchema.statics = {
+  createPlace(params) {
+    return this.create({
+     ...filteredBody(params, filleable)
+    });
+  },
   list({ sort = { createdAt: '-1' }, limit = 5, page = 1 } = {}) {
     return this.paginate({}, { sort, limit, page });
   },
@@ -93,23 +99,18 @@ PlaceSchema.methods = {
       slug: this.slug,
       description: this.description,
       avatarUrl: this.avatarImage,
-      coverUrl: this.coverImage
+      coverUrl: this.coverImage,
+      openHour: this.openHour,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt
     };
   },
   async uploadImage(path, type) {
     const url = await uploader(path);
     if (url) this.update({ [`${type}Image`]: url });
   },
-  update(params) {
-    const newParams = {};
-    fillable.forEach(attr => {
-      if (Object.prototype.hasOwnProperty.call(params, attr)) {
-        newParams[attr] = params[attr];
-      }
-    });
-
-    const place = Object.assign(this, newParams);
-    
+  update(params) { 
+    const place = Object.assign(this, filteredBody(params, filleable));
     return place.save();
   }
 }

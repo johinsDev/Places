@@ -6,6 +6,7 @@ import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import compression from 'compression';
 import expressWinston from 'express-winston';
+import passport from 'passport';
 import methodOverride from 'method-override';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -20,6 +21,7 @@ export default app => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(helmet());
+  app.use(passport.initialize());
   app.use(cors());
   app.use(methodOverride());
   if (isDev && !isTest) {

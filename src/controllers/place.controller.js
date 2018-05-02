@@ -1,5 +1,5 @@
 import Place from '../models/place.model';
-import { dispatch as jobUploadImage } from '../jobs/post.jobs';
+import { dispatch as jobUploadImage } from '../jobs/place.jobs';
 import APIError from '../services/error';
 import HTTPStatus from 'http-status';
 import upload from '../config/multer';
@@ -29,7 +29,7 @@ export async function find(req, res, next) {
 
 export async function create(req, res, next) {
   try {
-    const place = await Place.create(req.body);
+    const place = await Place.createPlace(req.body);
 
     jobUploadImage({ files: req.files, place });
 
