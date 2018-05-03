@@ -2,6 +2,7 @@
 
 import mongoose, { Schema } from 'mongoose';
 import { hashSync, compareSync } from 'bcrypt-nodejs';
+import Place from './place.model';
 import jwt from 'jsonwebtoken';
 import uniqueValidator from 'mongoose-unique-validator';
 import { filteredBody } from '../utils/filteredBody';
@@ -47,6 +48,10 @@ const UserSchema = new Schema(
 );
 
 const filleable = [ 'email', 'password', 'username' ];
+
+UserSchema.virtual('places').get(function() {
+  return Place.find({ user: this._id });
+});
 
 UserSchema.plugin(uniqueValidator, {
   message: '{VALUE} already taken!',

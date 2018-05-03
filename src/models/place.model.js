@@ -36,7 +36,12 @@ const PlaceSchema = new Schema({
     get: getAvatar
   },
   openHour: Number,
-  closeHour: Number
+  closeHour: Number,
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'Author is required!'] 
+  }
 }, { timestamps: true });
 
 const filleable = [ 'description', 'title', 'avatarImage', 'coverImage', 'openHour' ];
@@ -74,9 +79,10 @@ PlaceSchema.query.list = function({ sort = { createdAt: '-1' }, limit = 10, page
 }
 
 PlaceSchema.statics = {
-  createPlace(params) {
+  createPlace(params, user) {
     return this.create({
-     ...filteredBody(params, filleable)
+     ...filteredBody(params, filleable),
+      user
     });
   },
   list({ sort = { createdAt: '-1' }, limit = 5, page = 1 } = {}) {
@@ -97,6 +103,7 @@ PlaceSchema.methods = {
       id: this._id,
       title: this.title,
       slug: this.slug,
+      user: this.user,
       description: this.description,
       avatarUrl: this.avatarImage,
       coverUrl: this.coverImage,

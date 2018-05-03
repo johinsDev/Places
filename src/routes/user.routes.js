@@ -5,6 +5,13 @@ import { authJwt } from '../services/auth';
 
 const routes = new Router();
 
+routes.get(
+  '/:user_id/places',
+  authJwt,
+  UserController.policyPlace,
+  UserController.places
+);
+
 routes.post(
   '/signup',
   UserController.create

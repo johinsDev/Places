@@ -13,9 +13,20 @@ export function uploadImage() {
   ]);
 }
 
+export async function policyPlace(req, res, next) {
+  try {
+    if (req.place && req.place.user.toString() !== req.user._id.toString()) {
+      return res.sendStatus(HTTPStatus.UNAUTHORIZED);
+    }
+    next();
+  } catch (err) {
+    return next(err);
+  }
+}
+
 export async function find(req, res, next) {
   try {
-    req.place = await Place.findByIdOrSlug(req.params.id);
+    req.place = await Place.findByIdOrSlug(req.params.id).populate('user');
 
     if (!req.place) next(new APIError('Not Found Place!', HTTPStatus.NOT_FOUND, true));
 
@@ -29,7 +40,7 @@ export async function find(req, res, next) {
 
 export async function create(req, res, next) {
   try {
-    const place = await Place.createPlace(req.body);
+    const place = await Place.createPlace(req.body, req.user._id);
 
     jobUploadImage({ files: req.files, place });
 

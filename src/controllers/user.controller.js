@@ -2,6 +2,19 @@ import HTTPStatus from 'http-status';
 import APIError from '../services/error';
 
 import User from '../models/user.model';
+import Place from '../models/place.model';
+
+export async function policyPlace(req, res, next) {
+  try {
+    if (req.params.user_id.toString() !== req.user._id.toString()) {
+      return res.sendStatus(HTTPStatus.UNAUTHORIZED);
+    }
+
+    next();
+  } catch (err) {
+    return next(err);
+  }
+}
 
 export async function create(req, res, next) {
   try {
@@ -31,3 +44,12 @@ export async function login(req, res, next) {
   }
 }
 
+export async function places(req, res, next) {
+  try {
+    const places = await req.user.places;
+    res.status(HTTPStatus.OK).json(places);
+  } catch(e) {
+    e.status = HTTPStatus.BAD_REQUEST;
+    return next(e);
+  }
+}
