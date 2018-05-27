@@ -1,4 +1,5 @@
 import Place from '../models/place.model';
+import { map } from 'ramda'; 
 import { dispatch as jobUploadImage } from '../jobs/place.jobs';
 import APIError from '../services/error';
 import HTTPStatus from 'http-status';
@@ -56,7 +57,23 @@ export async function create(req, res, next) {
 export async function index(req, res, next) {
   try {
     const { page } = req.query;
-    res.status(HTTPStatus.OK).json(await Place.paginate({}, { page: 3, limit: 10 }));
+    const { user } = req;
+
+    let places = await Place.find({}).populate('favorites');
+
+    places = places.map(async (item) => {
+      const isFavorite = await item.isFavorited(user && user._id);
+      const likes = await item.likes(user && user._id);
+      const favorites = await item.favoriteBy(user && user._id);
+      return ({
+        ...item.toJSON(),
+        isFavorite,
+        likes,
+        favorites
+      });
+    });
+
+    res.status(HTTPStatus.OK).json(await Promise.all(places));
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);

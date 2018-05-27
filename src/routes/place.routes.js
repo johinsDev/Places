@@ -13,7 +13,10 @@ const routes = new Router();
  * CRUD
  */
 
-routes.get('/', PlaceController.index);
+routes.get('/',
+  authJwt,
+  PlaceController.index
+);
 
 routes.get('/:id',
   PlaceController.find,

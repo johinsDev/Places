@@ -1,3 +1,4 @@
+import passport from 'passport';
 import HTTPStatus from 'http-status';
 import APIError from '../services/error';
 
@@ -27,21 +28,15 @@ export async function create(req, res, next) {
 }
 
 export async function login(req, res, next) {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ $or: [{ email }, { username: email }]});
+  passport.authenticate('local', function(err, user, info) {
+    if (err) return next(err);
 
     if (!user) {
-      return next(new APIError('This email or username is not registered.', HTTPStatus.UNAUTHORIZED, true));
-    } else if (!user.authenticateUser(password)) {
-      return next(new APIError('Password not valid.', HTTPStatus.UNAUTHORIZED, true));
+      return next(new APIError(info.message, HTTPStatus.UNAUTHORIZED, true));
     }
 
     res.status(HTTPStatus.OK).json(user.toAuthJSON());
-  } catch(e) {
-    e.status = HTTPStatus.BAD_REQUEST;
-    return next(e);
-  }
+  })(req, res, next)
 }
 
 export async function places(req, res, next) {

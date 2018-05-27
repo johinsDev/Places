@@ -1,12 +1,11 @@
-/* eslint-disable import/no-mutable-exports */
 
 import mongoose, { Schema } from 'mongoose';
 import { hashSync, compareSync } from 'bcrypt-nodejs';
 import Place from './place.model';
+import Favorite from './favorite.model';
 import jwt from 'jsonwebtoken';
 import uniqueValidator from 'mongoose-unique-validator';
-import { filteredBody } from '../utils/filteredBody';
-
+import { filteredBody } from '../utils/filteredBody'; 
 import constants from '../config/constants';
 
 const UserSchema = new Schema(
@@ -49,6 +48,10 @@ const UserSchema = new Schema(
 
 const filleable = [ 'email', 'password', 'username' ];
 
+UserSchema.virtual('favorites').get(function() {
+  return Favorite.find({ user: this._id });
+});
+
 UserSchema.virtual('places').get(function() {
   return Place.find({ user: this._id });
 });
@@ -67,6 +70,18 @@ UserSchema.pre('save', function(next) {
 });
 
 UserSchema.methods = {
+  addFavorite(object) {
+    return object.addFavorite(this._id)
+  },
+  removeFavorite(object) {
+    return object.removeFavorite(this._id);
+  },
+  isFavorited(object) {
+    return object.isFavorited(this._id);
+  },
+  toggleFavorite(object) {
+    object.toggleFavorite(this._id);
+  },
   authenticateUser(password) {
     return compareSync(password, this.password);
   },

@@ -1,6 +1,7 @@
 import mongoose, { Schema, Types } from 'mongoose';
 import uploader from '../services/cloudinary';
 import mongoosePaginate from 'mongoose-paginate';
+import Favorite from './favorite.model';
 import { filteredBody } from '../utils/filteredBody';
 import slug from 'slug';
 
@@ -12,8 +13,7 @@ function getAvatar(avatar) {
 function getCover(cover) {
   if (!cover) return 'https://www.loottis.com/wp-content/uploads/2014/10/default-img.gif';
   return cover;
-}
-
+} 
 const PlaceSchema = new Schema({
   title: {
     type: String,
@@ -78,6 +78,10 @@ PlaceSchema.query.list = function({ sort = { createdAt: '-1' }, limit = 10, page
   return this.model.paginate(this._conditions, { sort, limit, page });
 }
 
+PlaceSchema.virtual('favorites').get(function() {
+  return Favorite.find({ favoritableId: this._id });
+});
+
 PlaceSchema.statics = {
   createPlace(params, user) {
     return this.create({
@@ -111,6 +115,27 @@ PlaceSchema.methods = {
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     };
+  },
+  myFavorite(user) {
+    return this.favorites.where({ user });
+  },
+  addFavorite(user) {
+    return Favorite.create({ user, favoritableId: this._id, favoritableType: this.constructor.modelName });
+  },
+  async isFavorited(user) {
+    return await this.myFavorite(user).count() > 0;
+  },
+  removeFavorite(user) {
+    return this.myFavorite(user).remove(); 
+  },
+  async toggleFavorite(user) {
+    return (await this.isFavorited(user) ? this.removeFavorite(user) : this.addFavorite(user));
+  },
+  favoriteBy(user) {
+    return this.favorites.populate('user');
+  },
+  likes() {
+    return this.favorites.count();
   },
   async uploadImage(path, type) {
     const url = await uploader(path);
