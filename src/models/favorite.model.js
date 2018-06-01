@@ -27,6 +27,9 @@ FavoriteSchema.methods = {
     });
   }
 }
+
+// @TODO: create alternative for poliformic relation
+
 let Favorite;
 
 try {

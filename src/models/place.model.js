@@ -2,6 +2,7 @@ import mongoose, { Schema, Types } from 'mongoose';
 import uploader from '../services/cloudinary';
 import mongoosePaginate from 'mongoose-paginate';
 import Favorite from './favorite.model';
+import Comment from './comment.model';
 import { filteredBody } from '../utils/filteredBody';
 import slug from 'slug';
 
@@ -78,6 +79,10 @@ PlaceSchema.query.list = function({ sort = { createdAt: '-1' }, limit = 10, page
   return this.model.paginate(this._conditions, { sort, limit, page });
 }
 
+PlaceSchema.virtual('comments').get(function() {
+  return Comment.find({ commentableId: this._id });
+});
+
 PlaceSchema.virtual('favorites').get(function() {
   return Favorite.find({ favoritableId: this._id });
 });
@@ -115,6 +120,12 @@ PlaceSchema.methods = {
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     };
+  },
+  addComment(user, comment) {
+    return Comment.create({ user, comment, commentableId: this._id, commentableType: this.constructor.modelName });
+  },
+  commentBy(user) {
+    return this.comments.populate('user');
   },
   myFavorite(user) {
     return this.favorites.where({ user });

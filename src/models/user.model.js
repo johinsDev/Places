@@ -82,6 +82,9 @@ UserSchema.methods = {
   toggleFavorite(object) {
     object.toggleFavorite(this._id);
   },
+  addComment(object, { comment }) {
+    object.addComment(this._id, comment);
+  },
   authenticateUser(password) {
     return compareSync(password, this.password);
   },

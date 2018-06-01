@@ -5,6 +5,7 @@
 import { Router } from 'express';
 
 import * as PlaceController from '../controllers/place.controller';
+import * as  Middlewares from '../middlewares/Find';
 import { authJwt } from '../services/auth';
 
 const routes = new Router();
@@ -19,21 +20,22 @@ routes.get('/',
 );
 
 routes.get('/:id',
-  PlaceController.find,
+  authJwt,
+  Middlewares.find('place'),
   PlaceController.show
 );
 
 routes.put(
   '/:id',
   authJwt,
-  PlaceController.find,
+  Middlewares.find('place'),
   PlaceController.policyPlace,
   PlaceController.update
 );
 
 routes.delete('/:id',
   authJwt,
-  PlaceController.find,
+  Middlewares.find('place'),
   PlaceController.policyPlace,
   PlaceController.destroy
 );

@@ -25,18 +25,6 @@ export async function policyPlace(req, res, next) {
   }
 }
 
-export async function find(req, res, next) {
-  try {
-    req.place = await Place.findByIdOrSlug(req.params.id).populate('user');
-
-    if (!req.place) next(new APIError('Not Found Place!', HTTPStatus.NOT_FOUND, true));
-
-    next();
-  } catch (err) {
-    return next(err);
-  }
-}
-
 // CONTROLLER FUNCTIONS
 
 export async function create(req, res, next) {
@@ -54,22 +42,25 @@ export async function create(req, res, next) {
   }
 }
 
+
 export async function index(req, res, next) {
   try {
     const { page } = req.query;
-    const { user } = req;
+    const { user = null } = req;
 
     let places = await Place.find({}).populate('favorites');
 
     places = places.map(async (item) => {
-      const isFavorite = await item.isFavorited(user && user._id);
-      const likes = await item.likes(user && user._id);
-      const favorites = await item.favoriteBy(user && user._id);
+      const isFavorite = await item.isFavorited(user);
+      const likes = await item.likes(user);
+      const favorites = await item.favoriteBy(user);
+      const comments = await item.commentBy(user);
       return ({
         ...item.toJSON(),
         isFavorite,
         likes,
-        favorites
+        favorites,
+        comments
       });
     });
 
@@ -80,9 +71,48 @@ export async function index(req, res, next) {
   }
 }
 
+// @TODO: create function call all methods, and create manager for get user in schemas
+// query paginate
+
+async function transformToComment(comment, user = null) {
+    const isFavorite = await comment.isFavorited(user);
+    const likes = await comment.likes(user);
+    const favorites = await comment.favoriteBy(user);
+    return ({
+      ...comment.toJSON(),
+      isFavorite,
+      likes,
+      favorites
+    });
+}
+
+async function transformToPlace(place, user = null) {
+    const isFavorite = await place.isFavorited(user);
+
+    const likes = await place.likes(user);
+
+    const favorites = await place.favoriteBy(user);
+
+    let comments = await place.commentBy(user);
+
+    comments = await Promise.all(comments.map(async (comment) => {
+      return await transformToComment(comment, user);
+    }));
+
+    return ({
+      ...place.toJSON(),
+      isFavorite,
+      comments,
+      likes,
+      favorites
+    });
+}
+
 export async function show(req, res, next) {
   try {
-    return res.status(HTTPStatus.OK).json(req.place);
+    const { user, place } = req;
+
+    return res.status(HTTPStatus.OK).json(await transformToPlace(place, user));
   } catch (err) {
     err.status = HTTPStatus.BAD_REQUEST;
     return next(err);

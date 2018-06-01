@@ -1,11 +1,11 @@
-import Favorite from '../models/favorite.model';
+import Comment from '../models/comment.model';
+import APIError from '../services/error';
 import HTTPStatus from 'http-status';
-import capitalize from '../utils/capitalize';
 
 export async function create(req, res, next) {
   try {
     const { model } = req.params;
-    await req.user.toggleFavorite(req[model]);
+    await req.user.addComment(req[model], req.body);
 
     return res.sendStatus(HTTPStatus.OK);
   } catch (err) {
